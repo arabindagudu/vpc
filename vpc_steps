@@ -1,0 +1,15 @@
+create a vpc with in the CIDR range 192.168.0.0/16
+create a subnet with in CIDR range  192.168.1.0/24[public subnet]
+cerate a subnet with in the CIDR range 192.168.2.0/24[private subnet]
+create a public routing table and associate it with the public subnet
+create a privatre routing table and associate it with private subnet
+cerate a internet gateway and attach it with the vpc which is created and associate with public subnet
+create a NAT gatyeway 
+choose public subnet
+connectivity type public 
+Allocate elastic IP
+choose my vpc 
+choose route tables
+click on private route table click on routes than edit routes 
+Add one more route  [FROM any instance 0.0.0.0/0 -natgateway]
+
