@@ -1,0 +1,151 @@
+{
+
+"Parameters":{},
+
+
+
+
+
+"Resources":{
+
+
+"myvpc": {
+  "Type": "AWS::EC2::VPC",
+  "Properties": {
+    "CidrBlock": "192.168.0.0/16"
+  }
+},
+
+"publicsubnet": {
+    "Type": "AWS::EC2::Subnet",
+    "Properties": {
+      "AvailabilityZone": "ap-south-1a",
+      "VpcId": 
+      { "Ref": "myvpc" }
+      ,
+      "CidrBlock": "192.168.1.0/24"
+    }
+  },
+  
+  
+  
+  "publicRoutingTable": {
+    "Type": "AWS::EC2::RouteTable",
+    "Properties": {
+      "VpcId":
+      { "Ref": "myvpc" }
+    }
+  },
+  
+
+
+"publicRoutingTableassociation": {
+  "Type": "AWS::EC2::SubnetRouteTableAssociation",
+  "Properties": {
+    "SubnetId": 
+    { "Ref": "publicsubnet" }
+    ,
+    "RouteTableId": 
+    { "Ref": "publicRoutingTable" }
+    
+  }
+},
+
+
+"myigw": {
+  "Type": "AWS::EC2::InternetGateway",
+  "Properties": {
+  }
+},
+"AttachGateway": {
+  "Type": "AWS::EC2::VPCGatewayAttachment",
+  "Properties": {
+    "VpcId": 
+    { "Ref": "myvpc" }
+    ,
+    "InternetGatewayId": { "Ref": "myigw" }
+  }
+},
+
+
+"privatesubnet": {
+    "Type": "AWS::EC2::Subnet",
+    "Properties": {
+      "AvailabilityZone": "ap-south-1a",
+      "VpcId":
+      { "Ref": "myvpc" }
+       ,
+      "CidrBlock": "192.168.2.0/24"
+    }
+  },
+  
+  
+  "privateRoutingTable": {
+    "Type": "AWS::EC2::RouteTable",
+    "Properties": {
+      "VpcId":
+      { "Ref": "myvpc" }
+      ,
+    }
+  },
+  
+  
+  "privateRoutTableassociation": {
+    "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    "Properties": {
+      "SubnetId":
+      { "Ref": "privatesubnet" }
+       ,
+      "RouteTableId": 
+      { "Ref": "privateRoutingTable" }
+      
+    }
+  },
+  
+  "EIP" : {
+    "Type" : "AWS::EC2::EIP",
+    },
+  
+
+    "NAT" : {
+        "Type" : "AWS::EC2::NatGateway",
+        "Properties" : {
+           "AllocationId" : { 
+               "Fn::GetAtt" : ["EIP", "AllocationId"] 
+           },
+           "SubnetId" : { 
+               "Ref" : "publicsubnet" 
+           },
+          }
+     },
+
+     "privateroute": {
+        "Type": "AWS::EC2::Route",
+        "Properties": {
+          "RouteTableId": 
+          { "Ref": "privateRoutingTable" }
+          ,
+          "DestinationCidrBlock": "0.0.0.0/0",
+          "NatGatewayId": 
+          { "Ref": "NAT" }
+          
+        }
+      }
+
+
+
+},
+
+
+
+
+
+
+"Outputs":{}
+
+
+
+
+
+
+}

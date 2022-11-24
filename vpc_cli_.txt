@@ -1,0 +1,61 @@
+1) create a vpc within cidr range 10.10.0.0/16 CIDR
+
+aws ec2 create-vpc --cidr-block 10.10.0.0/16 --query Vpc.VpcId --output text
+
+vpc-0630440d1b3f90608
+
+2) create a Public subnet with a 10.10.1.0/24 CIDR
+
+aws ec2 create-subnet --vpc-id vpc-0630440d1b3f90608 --cidr-block 10.10.1.0/24
+
+subnet-0e6487c1fca07de29
+
+3) create a private subnet with CIDR range 10.10.2.0/24
+
+aws ec2 create-subnet --vpc-id vpc-0630440d1b3f90608 --cidr-block 10.10.2.0/24
+
+SubnetId: subnet-0b2c778847c258e8d
+
+4) create a custom public route table for your vpc
+
+aws ec2 create-route-table --vpc-id vpc-0630440d1b3f90608 --query RouteTable.RouteTableId --output text
+
+rtb-0cbb76a89210232ac
+
+5) create a custom private route table for your vpc
+
+aws ec2 create-route-table --vpc-id vpc-0630440d1b3f90608 --query RouteTable.RouteTableId --output text
+
+rtb-0c4136d70914c3a57
+
+6) public subnet to associate with public routing table 
+
+aws ec2 associate-route-table --subnet-id subnet-0e6487c1fca07de29 --route-table-id rtb-0cbb76a89210232ac
+
+rtbassoc-08afdafd79a6ad43f
+
+7) private subnet associate with public routing table 
+
+aws ec2 associate-route-table --subnet-id subnet-0b2c778847c258e8d --route-table-id rtb-0c4136d70914c3a57
+
+rtbassoc-00eac1b9b174f8771
+
+8) create internet gateway
+
+aws ec2 create-internet-gateway --query InternetGateway.InternetGatewayId --output text
+
+igw-0a444c6a861984615
+
+9) attach the internetgaway to your vpc
+
+aws ec2 attach-internet-gateway --vpc-id vpc-0630440d1b3f90608 --internet-gateway-id igw-0a444c6a861984615
+
+10) create a route in the route table that point all traffic (0.0.0.0/0) to the internetgatway
+
+aws ec2 create-route --route-table-id rtb-0cbb76a89210232ac --destination-cidr-block 0.0.0.0/0 --gateway-id igw-0a444c6a861984615
+
+11) create a public instance 
+
+
+
+aws ec2 run-instances --image-id ami-0d8633ffb1a5574db --count 1 --instance-type t2.micro --key-name mylinux --security-group-ids sg-0c66ccfa4b1079af2 --subnet-id subnet-0e6487c1fca07de29
